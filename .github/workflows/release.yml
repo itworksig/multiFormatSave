@@ -46,11 +46,18 @@ jobs:
         if: steps.tag_check.outputs.exists == 'false'
         id: notes
         run: |
-          PREV_TAG=$(git tag --sort=-version:refname | head -1)
-          if [ -z "$PREV_TAG" ]; then
-            COMMITS=$(git log --oneline --no-merges)
-          else
+          # Find the previous version tag (exclude the one we're about to create)
+          PREV_TAG=$(git tag --sort=-version:refname \
+            | grep -v "^v${{ steps.version.outputs.version }}$" \
+            | head -1)
+
+          if [ -n "$PREV_TAG" ]; then
             COMMITS=$(git log "${PREV_TAG}..HEAD" --oneline --no-merges)
+          else
+            # First release — only show commits that touch plugin files or workflow
+            COMMITS=$(git log --oneline --no-merges \
+              -- plugin/ .github/ Makefile README.md \
+              | head -20)
           fi
 
           FEATURES=""
@@ -100,15 +107,31 @@ jobs:
               echo "### 🔧 Changes"
               echo -e "$OTHERS"
             fi
+            if [ -z "$FEATURES" ] && [ -z "$FIXES" ] && [ -z "$OTHERS" ]; then
+              echo ""
+              echo "_No significant changes logged._"
+            fi
             echo ""
             echo "---"
-            echo "**Full Changelog**: https://github.com/${{ github.repository }}/commits/v${{ steps.version.outputs.version }}"
+            if [ -n "$PREV_TAG" ]; then
+              echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...v${{ steps.version.outputs.version }}"
+            else
+              echo "**Full Changelog**: https://github.com/${{ github.repository }}/commits/v${{ steps.version.outputs.version }}"
+            fi
             echo "RELEASE_EOF"
           } >> $GITHUB_OUTPUT
 
       - name: Build .oxt package
         if: steps.tag_check.outputs.exists == 'false'
-        run: make
+        run: |
+          make
+          OXT=$(ls *.oxt 2>/dev/null | head -1)
+          if [ -z "$OXT" ]; then
+            echo "ERROR: No .oxt file was produced by make"
+            exit 1
+          fi
+          echo "Built: $OXT"
+          echo "oxt_file=$OXT" >> $GITHUB_ENV
 
       - name: Create git tag
         if: steps.tag_check.outputs.exists == 'false'
@@ -126,6 +149,6 @@ jobs:
           tag_name: v${{ steps.version.outputs.version }}
           name: MultiFormatSave v${{ steps.version.outputs.version }}
           body: ${{ steps.notes.outputs.notes }}
-          files: ${{ steps.version.outputs.filename }}
+          files: "*.oxt"
           draft: false
           prerelease: false

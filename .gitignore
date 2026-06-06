@@ -1,3 +1,4 @@
 *.oxt
 temp
 .idea
+.DS_Store
