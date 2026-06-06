@@ -122,7 +122,7 @@ Function saveFiles( sURL As String, aFormats() As Integer )
 
   ' Something bad happened when saving file
   ErrorHandler:
-    dChooseFormat.model.LHelp.Label = "&amp;SaveError"
+    dChooseFormat.model.LHelp.Label = "Unable to save the files, make sure the target files are closed."
     MsgBox "Error" &amp; ERR &amp; " on line " &amp; ERL &amp; ". " &amp; chr$(13) &amp; ERROR$
 End Function ' saveFiles
 
@@ -197,13 +197,13 @@ Function saveFileDialog(sDirectoryPath As String, Optional sFilePath As String) 
       .SetDisplayDirectory( ConvertToURL(sDirectoryPath) )
       .setTitle( "Save As ..." )
   End With
-  If ThisComponent.SupportsService( DOC_WRITER ) Then
+  If isComponentWriter() Then
     oFilePicker.appendFilter(GetFilterName("writer8"), "*.odt" )
-  ElseIf ThisComponent.SupportsService( DOC_CALC ) Then
+  ElseIf isComponentCalc() Then
     oFilePicker.appendFilter(GetFilterName("calc8"), "*.ods" )
-  ElseIf ThisComponent.SupportsService( DOC_IMPRESS ) Then
+  ElseIf isComponentImpress() Then
     oFilePicker.appendFilter(GetFilterName("impress8"), "*.odp" )
-  ElseIf ThisComponent.SupportsService( DOC_DRAW ) Then
+  ElseIf isComponentDraw() Then
     oFilePicker.appendFilter(GetFilterName("draw8"), "*.odg" )
   EndIf
   If Not IsMissing( sFilePath ) Then
@@ -327,10 +327,10 @@ End Function ' setUIProperties
 Function enableSaveButton()
 If ( DChooseFormat.model.CB0.state = 0 And DChooseFormat.model.CB1.state = 0 And DChooseFormat.model.CB2.state = 0 And DChooseFormat.model.CB3.state = 0 And DChooseFormat.model.CB4.state = 0 And DChooseFormat.model.CB5.state = 0 ) Then
     DChooseFormat.model.BSave.enabled = FALSE
-    DChooseFormat.model.LHelp.Label = "&amp;InputFormatError"
+    DChooseFormat.model.LHelp.Label = "At least one format needs to be selected."
   ElseIf ( DChooseFormat.model.TFPath.text = "" Or right( DChooseFormat.model.TFPath.text, 1) = "/") Then
     DChooseFormat.model.BSave.enabled = FALSE
-    DChooseFormat.model.LHelp.Label = "&amp;InputTextError"
+    DChooseFormat.model.LHelp.Label = "You must provide a file name with path."
   Else
     DChooseFormat.model.BSave.enabled = TRUE
     DChooseFormat.model.LHelp.Label = ""
