@@ -14,7 +14,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with this program.  If not, see <http:www.gnu.org/licenses/>.
 #
-version := $(strip 1.6.0)
+version := 1.6.0
 version_dashes := $(subst .,-, $(version))
 filename := multiFormatSave_v$(version_dashes).oxt
 

@@ -22,7 +22,7 @@ jobs:
       - name: Read version
         id: version
         run: |
-          VERSION=$(grep '^version' Makefile | head -1 | sed 's/version[[:space:]]*=[[:space:]]*//')
+          VERSION=$(grep '^version[[:space:]]*:*=' Makefile | head -1 | sed 's/version[[:space:]]*:*=[[:space:]]*//' | tr -d '[:space:]')
           VERSION_DASHES=$(echo "$VERSION" | tr '.' '-')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=v$VERSION" >> $GITHUB_OUTPUT
