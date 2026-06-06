@@ -14,20 +14,20 @@
 #     You should have received a copy of the GNU General Public License
 #     along with this program.  If not, see <http:www.gnu.org/licenses/>.
 #
-version = 1.6.0
-version_dashes = $(subst .,-, $(version))
-filename = multiFormatSave_v$(version_dashes).oxt
+version := $(strip 1.6.0)
+version_dashes := $(subst .,-, $(version))
+filename := multiFormatSave_v$(version_dashes).oxt
 
 all: clean compose
 
 compose:
 	$(info *** COMPOSE ***)
+	$(info *** filename: $(filename) ***)
 	cp -r plugin temp
-	sed -i "s/VERSION/${version}/" temp/description.xml
+	sed -i "s/VERSION/$(version)/" temp/description.xml
 	cp LICENSE temp
 	cp README.md temp
-
-	cd temp; zip -r ../$(filename) *
+	cd temp && zip -r "../$(filename)" *
 	rm -rf temp
 	$(info *** BUILT: $(filename) ***)
 

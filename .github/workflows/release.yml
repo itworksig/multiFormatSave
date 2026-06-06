@@ -123,9 +123,11 @@ jobs:
         if: steps.tag_check.outputs.exists == 'false'
         run: |
           make
-          OXT=$(ls *.oxt 2>/dev/null | head -1)
+          echo "=== directory after make ==="
+          ls -la
+          OXT=$(find . -maxdepth 1 -name "*.oxt" | head -1 | sed 's|^\./||')
           if [ -z "$OXT" ]; then
-            echo "ERROR: No .oxt file was produced by make"
+            echo "ERROR: No .oxt file found after make"
             exit 1
           fi
           echo "Built: $OXT"
