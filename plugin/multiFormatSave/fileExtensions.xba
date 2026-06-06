@@ -42,6 +42,8 @@ Private Function getExtensionWriter(format As String) As String
     getExtensionWriter() = "docx"
   ElseIf (format = "RTF") Then
     getExtensionWriter() = "rtf"
+  ElseIf (format = "EPUB") Then
+    getExtensionWriter() = "epub"
   EndIf
 End Function
 

@@ -14,7 +14,9 @@
 #     You should have received a copy of the GNU General Public License
 #     along with this program.  If not, see <http:www.gnu.org/licenses/>.
 #
-version = 1.5.7
+version = 1.6.0
+version_dashes = $(subst .,-, $(version))
+filename = multiFormatSave_v$(version_dashes).oxt
 
 all: clean compose
 
@@ -25,8 +27,9 @@ compose:
 	cp LICENSE temp
 	cp README.md temp
 
-	cd temp; zip -r ../multiFormatSave_v${version}.oxt *
+	cd temp; zip -r ../$(filename) *
 	rm -rf temp
+	$(info *** BUILT: $(filename) ***)
 
 clean:
 	$(info *** CLEAN ***)

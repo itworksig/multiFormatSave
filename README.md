@@ -1,66 +1,110 @@
-# MultiFormatSave #
+# MultiFormatSave
 
-This extension to LibreOffice enables the user to save a document in multiple formats at once.
-For Writer the formats OpenDocument, MS Office 97, MS Office 07 XML, RTF and PDF are supported.
-For Calc and Impress the formats OpenDocument, MS Office 97, MS Office 07 XML and PDF are supported.
-For Draw the formats OpenDocument, PNG, SVG and PDF are supported.
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![Latest Release](https://img.shields.io/github/v/release/itworksig/multiFormatSave?label=latest)](https://github.com/itworksig/multiFormatSave/releases/latest)
+[![LibreOffice](https://img.shields.io/badge/LibreOffice-6.0%2B-brightgreen)](https://www.libreoffice.org/)
 
-Please download the extension for LibreOffice from https://extensions.libreoffice.org/extensions/multisave-1
+A LibreOffice extension that saves your document to **multiple formats simultaneously** — ODF, MS Office 97, MS Office XML, PDF, RTF and EPUB — with a single click.
 
-This extension is based on the StarXpert MultiSave extension and is licenced in the LGPL+-licence.
 
-# Changelog #
+## Features
 
-## v1.5.6 ##
-- updated icons
+- **One-click multi-format export** — save to several formats at once without reopening dialogs
+- **Remembers your choices** — selected formats are persisted between sessions
+- **Save-like shortcut** — if the document hasn't changed location, re-runs the last save silently (no dialog)
+- **Works across all four apps** — Writer, Calc, Impress and Draw each get relevant format options
+- **Toolbar & menu integration** — accessible from the standard toolbar and the File menu
 
-## v1.5.5 ##
-- updated german translation
+---
 
-## v1.5.4 ##
-- Added support for RTF in Writer
+## Supported Formats
 
-## v1.5.3 ##
-- Improved default values
+| App         | Format                     | Extension |
+| ----------- | -------------------------- | --------- |
+| **Writer**  | ODF Text                   | `.odt`    |
+|             | MS Word 97–2003            | `.doc`    |
+|             | MS Word 2007–365 XML       | `.docx`   |
+|             | PDF                        | `.pdf`    |
+|             | Rich Text Format           | `.rtf`    |
+|             | EPUB (LO 6.0+)             | `.epub`   |
+| **Calc**    | ODF Spreadsheet            | `.ods`    |
+|             | MS Excel 97–2003           | `.xls`    |
+|             | MS Excel 2007–365 XML      | `.xlsx`   |
+|             | PDF                        | `.pdf`    |
+| **Impress** | ODF Presentation           | `.odp`    |
+|             | MS PowerPoint 97–2003      | `.ppt`    |
+|             | MS PowerPoint 2007–365 XML | `.pptx`   |
+|             | PDF                        | `.pdf`    |
+| **Draw**    | ODF Drawing                | `.odg`    |
+|             | PNG image                  | `.png`    |
+|             | SVG vector                 | `.svg`    |
+|             | PDF                        | `.pdf`    |
 
-## v1.5.2 ##
-- Added Draw support
-- Default language now English
-- Czech translation added
+---
 
-## v1.5.1 ##
-Reverted Release
+## Installation
 
-## v1.5 ##
-- Added save-like-function
-- Toolbar-icon now is set to the save-like-function
-- Remembers the last formats you selected
-- Improved Dialog
-- Different Dialog for OpenOffice and LibreOffice
-- Code cleanup
+### Option A — Extension Manager (recommended)
 
-## v1.4.1 ##
-- Added support for Apache OpenOffice 4
+1. Download the latest `.oxt` file from [Releases](https://github.com/itworksig/multiFormatSave/releases/latest)
+2. In LibreOffice: **Tools → Extension Manager → Add**
+3. Select the downloaded `.oxt` and restart LibreOffice
 
-## v1.4.1 ##
-- Now able to save in Microsoft Office 2007 XML format
-- At unsaved document now the default directory is shown
-- At unsaved document and ODF selected it automaticly saves the current document
-- Easier GUI
+### Option B — LibreOffice Extensions website
 
-## v1.3.4 ##
-- Errors don't close the dialog anymore
-- Hungarian translation added
+[extensions.libreoffice.org/extensions/multisave-1](https://extensions.libreoffice.org/extensions/multisave-1)
 
-## v1.3.3 ##
-- New Icons
-- Able to multiSave unsaved documents
-- Better complience in dialog with LibreOffice standards
-- Added Dutch language
-- Works with version 4.1
+---
 
-## v1.3.2 ##
-- Fork from MultiSave
-- Renaming
-- Replace Icons
+## How to Use
 
+After installation two new entries appear in the **File** menu and a button is added to the standard toolbar:
+
+- **Multi Save** — Saves in all selected formats silently if the document already has a location. Opens the dialog for new or moved documents.
+- **Multi Save As…** — Always opens the format-selection dialog.
+
+In the dialog:
+
+1. Set or confirm the save **path and filename** (without extension — the extension is added per format)
+2. Tick the **formats** you want
+3. Click **Save**
+
+---
+
+## Building from Source
+
+Requires `make` and `zip`.
+
+```bash
+# Build the .oxt package
+make
+
+# Clean build artefacts
+make clean
+```
+
+To release a new version, bump `version` in `Makefile` and push to `master`. The GitHub Action handles the rest.
+
+---
+
+## Changelog
+
+### v1.6.0
+
+- **Added** EPUB export for Writer (LibreOffice 6.0+)
+- **Added** minimum LibreOffice 6.0 version requirement in extension metadata
+- **Added** flat ODF extensions (`.fodt`, `.fods`, `.fodp`, `.fodg`) to extension-stripping list
+- **Fixed** critical module name conflict (`saveDocuments` vs `settings`) that caused save functions to be silently overwritten
+- **Fixed** syntax error in `exportArguments` — missing closing parenthesis caused parse failure
+- **Fixed** missing `.` separator in file path construction (files were named e.g. `documentpdf` instead of `document.pdf`)
+- **Fixed** crash on startup — `FormWizard` library was removed in LibreOffice 6.x but was still being loaded
+- **Fixed** all save operations now pass an explicit `FilterName` to `storeAsURL`, preventing failures when "Always save in ODF format" is enabled
+- **Fixed** `removeExtension` — `.odm` was missing its leading dot; duplicate `.odg` entry removed
+
+
+## License
+
+- Original work © 2004–2012 StarXpert, Florent Manens — LGPL v2.1+
+- Subsequent work © 2012–present Rob Snelders — GPL v3+
+
+See [LICENSE](LICENSE) for details.

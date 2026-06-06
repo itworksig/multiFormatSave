@@ -3,6 +3,10 @@
   <identifier value="extensions.multiFormatSave"/>
   <version value="VERSION"/>
   <platform value="all" />
+  <dependencies>
+    <lo:LibreOffice-minimal-version xmlns:lo="http://libreoffice.org/extensions/description/2011"
+      lo:value="6.0" lo:name="LibreOffice 6.0"/>
+  </dependencies>
   <registration>
     <simple-license>
       <license-text xlink:href="LICENSE" lang="en" />

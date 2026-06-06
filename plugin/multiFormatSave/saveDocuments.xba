@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="settings" script:language="StarBasic">REM  *****  BASIC  *****
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="saveDocuments" script:language="StarBasic">REM  *****  BASIC  *****
 
 '************************************************
 'Copyright (C) 2018 and later -- Rob Snelders (GPL v3+)
@@ -21,14 +21,16 @@
 
 Private Function saveOrExportDocument(baseUrl As String, format As String)
     If (isExportedDocument(format)) Then
-      exportDocument(baseUrl + getExtension(format), format)
+      exportDocument(baseUrl + "." + getExtension(format), format)
     Else
-      saveDocument(baseUrl + getExtension(format))
+      saveDocument(baseUrl + "." + getExtension(format), format)
     EndIf
 End Function
 
-Private Function saveDocument(fileURL As String)
-    ThisComponent.storeAsURL(fileURL, Array())
+Private Function saveDocument(fileURL As String, format As String)
+    Dim args(0) As New com.sun.star.beans.PropertyValue
+    args(0) = makePropertyValue("FilterName", saveFilterName(format))
+    ThisComponent.storeAsURL(fileURL, args())
 End Function
 
 Private Function exportDocument(fileURL As String, format As String)
@@ -36,20 +38,55 @@ Private Function exportDocument(fileURL As String, format As String)
 End Function
 
 Private Function exportArguments(format As String) As Array
-  Dim arguments(2) As New com.sun.star.beans.PropertyValue
-  arguments( 0 ) = makePropertyValue( "FilterName", exportFilterName( format )
-  ' This 2nd property is only needed for pdf. But doesn't hurt the others as it is ignored there
-  arguments( 1 ) = makePropertyValue( "CompressMode", 0 )
+  Dim arguments(1) As New com.sun.star.beans.PropertyValue
+  arguments( 0 ) = makePropertyValue( "FilterName", exportFilterName( format ) )
+  arguments( 1 ) = makePropertyValue( "FilterOptions", "" )
   exportArguments() = arguments
 End Function
 
+Private Function saveFilterName(format As String) As String
+  If (isComponentWriter()) Then
+    If (format = "ODF") Then
+      saveFilterName() = "writer8"
+    ElseIf (format = "MSO") Then
+      saveFilterName() = "MS Word 97"
+    ElseIf (format = "MSX") Then
+      saveFilterName() = "MS Word 2007 XML"
+    ElseIf (format = "RTF") Then
+      saveFilterName() = "Rich Text Format"
+    EndIf
+  ElseIf (isComponentCalc()) Then
+    If (format = "ODF") Then
+      saveFilterName() = "calc8"
+    ElseIf (format = "MSO") Then
+      saveFilterName() = "MS Excel 97"
+    ElseIf (format = "MSX") Then
+      saveFilterName() = "Calc MS Excel 2007 XML"
+    EndIf
+  ElseIf (isComponentImpress()) Then
+    If (format = "ODF") Then
+      saveFilterName() = "impress8"
+    ElseIf (format = "MSO") Then
+      saveFilterName() = "MS PowerPoint 97"
+    ElseIf (format = "MSX") Then
+      saveFilterName() = "Impress MS PowerPoint 2007 XML"
+    EndIf
+  ElseIf (isComponentDraw()) Then
+    If (format = "ODF") Then
+      saveFilterName() = "draw8"
+    EndIf
+  EndIf
+End Function
+
 Private Function isExportedDocument(format As String) As Boolean
-  isExportedDocument() = (format = "PDF" Or format = "SVG" Or format = "PNG")
+  isExportedDocument() = (format = "PDF" Or format = "SVG" Or format = "PNG" Or format = "EPUB")
 End Function
 
 Private Function exportFilterName(format As String) As String
   If (isComponentWriter() And format = "PDF") Then
-      exportFilterName() = "writer_pdf_Export"
+    exportFilterName() = "writer_pdf_Export"
+  ElseIf (isComponentWriter() And format = "EPUB") Then
+    exportFilterName() = "writer_epub_Export"
   ElseIf (isComponentCalc() And format = "PDF") Then
     exportFilterName() = "calc_pdf_Export"
   ElseIf (isComponentImpress() And format = "PDF") Then
