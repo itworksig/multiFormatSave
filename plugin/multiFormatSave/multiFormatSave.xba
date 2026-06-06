@@ -55,9 +55,27 @@ Function multiFormatSaveAs()
 End Function 'multiFormatSaveAs
 
 Function initLibraries()
-    loadBasicLibrary("Tools")
     dChooseFormat = createDialog()
 End Function 'initLibraries
+
+' Returns the localized UI name for a filter, querying the FilterFactory directly.
+' Falls back to the internal name if the filter is not found.
+Function GetFilterName(sInternalName As String) As String
+  On Local Error GoTo Fallback
+  Dim oFactory As Object
+  Dim aProps As Variant
+  Dim i As Integer
+  oFactory = CreateUnoService("com.sun.star.document.FilterFactory")
+  aProps = oFactory.getByName(sInternalName)
+  For i = 0 To UBound(aProps)
+    If aProps(i).Name = "UIName" Then
+      GetFilterName = aProps(i).Value
+      Exit Function
+    End If
+  Next i
+  Fallback:
+  GetFilterName = sInternalName
+End Function
 
 ' Starts the dialog when needed
 Function startDialog()
@@ -133,9 +151,27 @@ End Function ' getFormat
 Function choosePath()
   Dim sPath As String
   Dim sURL As String
+  Dim sDir As String
+  Dim sFile As String
   sPath = DChooseFormat.model.TFPath.text
   If sPath &lt;&gt; "" And right( sPath, 1 ) &lt;&gt; "/" Then
-      sURL = saveFileDialog(DirectoryNameoutofPath(sPath, "/"), FileNameoutofPath(sPath, "/"))
+      Dim iSlash As Integer
+      iSlash = 0
+      Dim iPos As Integer
+      For iPos = Len(sPath) To 1 Step -1
+        If Mid(sPath, iPos, 1) = "/" Then
+          iSlash = iPos
+          Exit For
+        End If
+      Next iPos
+      If iSlash &gt; 0 Then
+        sDir  = Left(sPath, iSlash)
+        sFile = Mid(sPath, iSlash + 1)
+      Else
+        sDir  = sPath
+        sFile = ""
+      End If
+      sURL = saveFileDialog(sDir, sFile)
   ElseIf sPath &lt;&gt; "" Then
       sURL = saveFileDialog(sPath)
   Else
